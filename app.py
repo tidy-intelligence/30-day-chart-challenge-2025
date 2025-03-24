@@ -1,34 +1,25 @@
-import seaborn as sns
-
-# Import data from shared.py
-from shared import df
 from shiny.express import input, render, ui
+from shinywidgets import render_altair
 
-ui.page_opts(title="Shiny navigation components")
+from charts import fractions_chart
+from utils import placeholder_text
 
-ui.nav_spacer()  # Push the navbar items to the right
+ui.page_opts(title="30 Day Chart Challenge")
 
-footer = ui.input_select(
-    "var", "Select variable", choices=["bill_length_mm", "body_mass_g"]
-)
-
-with ui.nav_panel("Page 1"):
-    with ui.navset_card_underline(title="Penguins data", footer=footer):
-        with ui.nav_panel("Plot"):
-
-            @render.plot
-            def hist():
-                p = sns.histplot(
-                    df, x=input.var(), facecolor="#007bc2", edgecolor="white"
-                )
-                return p.set(xlabel=None)
-
-        with ui.nav_panel("Table"):
-
-            @render.data_frame
-            def data():
-                return df[["species", "island", input.var()]]
+ui.nav_spacer()
 
 
-with ui.nav_panel("Page 2"):
-    "This is the second 'page'."
+with ui.nav_panel("Comparisons"):
+    with ui.navset_card_underline(title="World Bank WDI"):
+        with ui.nav_panel("Fractions"):
+
+            @render_altair
+            def fractions():
+                return fractions_chart()
+
+        with ui.nav_panel("Slope"):
+            placeholder_text()
+
+
+with ui.nav_panel("Distributions"):
+    placeholder_text()
