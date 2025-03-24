@@ -1,11 +1,15 @@
+from pathlib import Path
+
 from shiny import App, render, ui
 from shinywidgets import output_widget, render_altair
 
 from charts import fractions_chart
 from utils import placeholder_text
 
+app_dir = Path(__file__).parent
+
 app_ui = ui.page_navbar(
-    ui.head_content(ui.include_css("styles.css")),
+    ui.head_content(ui.include_css(app_dir / "styles.css")),
     ui.nav_panel(
         "Comparisons",
         ui.card(
