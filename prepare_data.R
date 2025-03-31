@@ -149,3 +149,31 @@ big_or_small <- big_or_small |>
 # summarize(across(everything(), sum))
 
 write_csv(big_or_small, "data/big_or_small.csv")
+
+# Rankings ---------------------------------------------------------------
+
+# https://dataverse.harvard.edu/dataverse/atlas
+
+ranking_raw <- read_delim("data-raw/rankings.tab")
+location_raw <- read_delim("data-raw/location_country.tab")
+
+ranking <- ranking_raw |>
+    left_join(locations_raw, join_by(country_id)) |>
+    # left_join(entities, join_by(iso3_code == entity_id)) |>
+    select(
+        name = name_short_en,
+        year,
+        rank = sitc_eci_rank
+    ) |>
+    drop_na()
+
+selected_ranking <- ranking |>
+    filter(year == 2022) |>
+    arrange(rank) |>
+    slice(1:10) |>
+    distinct(name)
+
+ranking <- ranking |>
+    inner_join(selected_ranking, join_by(name))
+
+write_csv(ranking, "data/ranking.csv")

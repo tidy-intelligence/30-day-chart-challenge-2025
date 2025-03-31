@@ -1,4 +1,4 @@
-## Basic navigation app
+## 30 Day Chart Challenge
 
 Record the environment:
 
@@ -19,5 +19,3 @@ To build the app:
 ```
 shinylive export . docs
 ```
-
-TODO: https://anthology-of-data.science/posts/altair/better-altair-theme.html

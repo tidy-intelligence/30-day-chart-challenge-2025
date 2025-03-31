@@ -7,6 +7,7 @@ fractions_data = pd.read_csv(app_dir / "data/fractions.csv")
 slope_data = pd.read_csv(app_dir / "data/slope.csv")
 circular_data = pd.read_csv(app_dir / "data/circular.csv")
 big_or_small_data = pd.read_csv(app_dir / "data/big_or_small.csv")
+ranking_data = pd.read_csv(app_dir / "data/ranking.csv")
 
 
 def group_farm_size(name):

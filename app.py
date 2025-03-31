@@ -3,7 +3,13 @@ from pathlib import Path
 from shiny import App, render, ui
 from shinywidgets import output_widget, render_altair
 
-from charts import big_or_small_chart, circular_chart, fractions_chart, slope_chart
+from charts import (
+    big_or_small_chart,
+    circular_chart,
+    fractions_chart,
+    ranking_chart,
+    slope_chart,
+)
 from utils import placeholder_text
 
 css_file = Path(__file__).parent / "css" / "styles.css"
@@ -61,7 +67,20 @@ app_ui = ui.page_navbar(
                     "*Data Source*: [Lowder, Sanchez & Bertini (2021)](https://www.sciencedirect.com/science/article/pii/S0305750X2100067X#m0065)."
                 ),
             ),
-            ui.card(ui.card_header("Ranking")),
+            ui.card(
+                ui.card_header("Ranking"),
+                ui.markdown(
+                    "The figure shows the the **Economic Complexity Index ranking**, "
+                    "which is a measure of the amount of capabilities and knowhow of a "
+                    "given country determined by the diversity, ubiquity, and complexity "
+                    "of the products it exports. It shows the trajectories of the top 10 countries "
+                    "in 2022."
+                ),
+                output_widget("ranking"),
+                ui.markdown(
+                    "*Data Source*: [The Atlas of Economic Complexity](https://dataverse.harvard.edu/dataverse/atlas) by The Growth Lab at Harvard University."
+                ),
+            ),
             ui.card(ui.card_header("Florence Nightingal")),
             width=1 / 2,
         ),
@@ -91,6 +110,11 @@ def server(input, output, session):
     @render_altair
     def big_or_small():
         return big_or_small_chart()
+
+    @output()
+    @render_altair
+    def ranking():
+        return ranking_chart()
 
 
 app = App(app_ui, server)

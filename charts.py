@@ -1,6 +1,12 @@
 import altair as alt
 
-from data import big_or_small_data, circular_data, fractions_data, slope_data
+from data import (
+    big_or_small_data,
+    circular_data,
+    fractions_data,
+    ranking_data,
+    slope_data,
+)
 
 
 # NOTE: this approach only works on altair==5.4.1 (which is the pyodide version)
@@ -170,8 +176,42 @@ def big_or_small_chart():
         .interactive()
     )
 
-    c1 = chart.mark_arc(innerRadius=20, stroke="#fff")
-    c2 = chart.mark_text(radiusOffset=50).encode(text="size_group")
+    arc = chart.mark_arc(innerRadius=20, stroke="#fff")
+    text = chart.mark_text(radiusOffset=50).encode(text="size_group")
 
-    chart = c1 + c2
+    chart = arc + text
+    return chart
+
+
+def ranking_chart():
+    hover = alt.selection_single(on="mouseover")
+
+    base_chart = alt.Chart(ranking_data).encode(
+        x=alt.X("year", axis=alt.Axis(format="d", title=None)),
+        y=alt.Y("rank", axis=alt.Axis(title=None)),
+        color=alt.Color("name:N", legend=None),
+        opacity=alt.condition(hover, alt.value(1), alt.value(0.2)),
+        strokeWidth=alt.condition(hover, alt.value(3), alt.value(1)),
+    )
+
+    lines = base_chart.mark_line(point=True)
+
+    labels = (
+        alt.Chart(ranking_data)
+        .transform_filter(alt.datum.year == 2022)
+        .mark_text(align="left", dx=5)
+        .encode(
+            x=alt.X("year", axis=alt.Axis(format="d", title=None)),
+            y=alt.Y("rank", axis=alt.Axis(title=None)),
+            text="name",
+            color="name",
+        )
+    )
+
+    chart = (
+        (lines + labels)
+        .add_params(hover)
+        .properties(title="Rank in the Economic Complexity Index")
+    )
+
     return chart
