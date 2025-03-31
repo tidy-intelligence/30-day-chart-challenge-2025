@@ -87,6 +87,7 @@ app_ui = ui.page_navbar(
     ),
     ui.nav_panel("Distributions", ui.markdown(placeholder_text())),
     title="30 Day Chart Challenge",
+    navbar_options=ui.navbar_options(position="fixed-top"),
 )
 
 
