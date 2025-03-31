@@ -1,6 +1,6 @@
 import altair as alt
 
-from data import circular_data, fractions_data, slope_data
+from data import big_or_small_data, circular_data, fractions_data, slope_data
 
 
 # NOTE: this approach only works on altair==5.4.1 (which is the pyodide version)
@@ -146,4 +146,32 @@ def circular_chart():
         )
         .interactive()
     )
+    return chart
+
+
+def big_or_small_chart():
+    chart = (
+        alt.Chart(big_or_small_data)
+        .encode(
+            alt.Theta("area").stack(True),
+            alt.Radius("area").scale(type="sqrt"),
+            color=alt.Color("size_group:N", legend=None),
+            tooltip=[
+                alt.Tooltip("size_group", title="Farm size"),
+                alt.Tooltip("area", title="Share of agricultural area", format=".1%"),
+                alt.Tooltip("farms", title="Number of farms", format=","),
+            ],
+        )
+        .properties(
+            title=alt.TitleParams(
+                "Distribution of global agricultural area by farm size",
+            )
+        )
+        .interactive()
+    )
+
+    c1 = chart.mark_arc(innerRadius=20, stroke="#fff")
+    c2 = chart.mark_text(radiusOffset=50).encode(text="size_group")
+
+    chart = c1 + c2
     return chart

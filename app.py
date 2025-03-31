@@ -3,7 +3,7 @@ from pathlib import Path
 from shiny import App, render, ui
 from shinywidgets import output_widget, render_altair
 
-from charts import circular_chart, fractions_chart, slope_chart
+from charts import big_or_small_chart, circular_chart, fractions_chart, slope_chart
 from utils import placeholder_text
 
 css_file = Path(__file__).parent / "css" / "styles.css"
@@ -51,7 +51,16 @@ app_ui = ui.page_navbar(
                     "*Data Source*: [Eurostat](https://ec.europa.eu/eurostat/cache/metadata/en/cei_srm030_esmsip2.htm)."
                 ),
             ),
-            ui.card(ui.card_header("Big or Small")),
+            ui.card(
+                ui.card_header("Big or Small"),
+                ui.markdown(
+                    "The figure shows the global farmland distribution by **farm size**, with farms under 1 ha labeled Small, with those from 1-100 ha as Medium, 100-1,000 ha as Big, and anything larger as Very Big."
+                ),
+                output_widget("big_or_small"),
+                ui.markdown(
+                    "*Data Source*: [Lowder, Sanchez & Bertini (2021)](https://www.sciencedirect.com/science/article/pii/S0305750X2100067X#m0065)."
+                ),
+            ),
             ui.card(ui.card_header("Ranking")),
             ui.card(ui.card_header("Florence Nightingal")),
             width=1 / 2,
@@ -77,6 +86,11 @@ def server(input, output, session):
     @render_altair
     def circular():
         return circular_chart()
+
+    @output()
+    @render_altair
+    def big_or_small():
+        return big_or_small_chart()
 
 
 app = App(app_ui, server)

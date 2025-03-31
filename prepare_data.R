@@ -7,21 +7,8 @@ library(readr)
 
 entities <- wdi_get_entities()
 
-# trade_raw <- owid_get("trade-as-share-of-gdp")
-# gov_spending_raw <- owid_get("historical-gov-spending-gdp")
-gdp_per_capita_raw <- owid_get("gdp-per-capita-worldbank")
 
-
-# gdp_per_capita_raw |>
-#     filter(year == 2022) |>
-#     select(entity_id, gdp_per_capita = ny_gdp_pcap_pp_kd) |>
-#     left_join(
-#         gov_spending_raw |>
-#             filter(year == 2022) |>
-#             mutate(gov_exp = expenditure / 100) |>
-#             select(entity_id, gov_exp),
-#         join_by(entity_id)
-#     )
+# Fraction ---------------------------------------------------------------
 
 gdp_per_capita_raw <- wdi_get(
     "all",
@@ -60,9 +47,9 @@ fraction <- fraction_raw |>
 
 write_csv(fraction, "data/fractions.csv")
 
-
 # Slope ------------------------------------------------------------------
 
+# https://ourworldindata.org/grapher/female-labor-force-participation-rates-slopes
 slope_raw <- owid_get("female-labor-force-participation-rates-slopes")
 
 slope_sub <- slope_raw |>
@@ -81,13 +68,14 @@ slope_selected <- slope_sub |>
 
 slope <- slope_sub |>
     inner_join(slope_selected, join_by(entity_name)) |>
-    select(name = entity_name, value)
+    select(name = entity_name, year, value)
 
 write_csv(slope, "data/slope.csv")
 
 
 # Circular ---------------------------------------------------------------
 
+# https://ec.europa.eu/eurostat/databrowser/view/cei_srm030/default/table?lang=en
 circular_raw <- read_delim("data-raw/estat_cei_srm030.tsv", delim = "\t")
 
 circular <- circular_raw |>
@@ -113,3 +101,51 @@ circular <- circular_raw |>
     )
 
 write_csv(circular, "data/circular.csv")
+
+
+# Big or Small -----------------------------------------------------------
+
+# https://www.sciencedirect.com/science/article/pii/S0305750X2100067X#m0045
+big_or_small_raw <- read_csv2("data-raw/big_or_small_raw.csv")
+
+big_or_small <- big_or_small_raw |>
+    fill(
+        `Regional or income group aggregate`,
+        .direction = "down"
+    ) |>
+    filter(
+        `Number or share of farms / agricultural area` %in%
+            c("share of agricultural area (%)", "number of farms")
+    ) |>
+    pivot_longer(
+        cols = `All sizes`:`> 1 000 ha`
+    ) |>
+    rename(
+        entity = `Regional or income group aggregate`,
+        type = `Number or share of farms / agricultural area`
+    )
+
+big_or_small <- big_or_small |>
+    filter(entity == "World (129)") |>
+    filter(type == "number of farms") |>
+    select(name, farms = value) |>
+    left_join(
+        big_or_small |>
+            filter(entity == "World (129)") |>
+            filter(type == "share of agricultural area (%)") |>
+            select(name, area = value),
+        join_by(name)
+    ) |>
+    filter(name != "All sizes") |>
+    mutate(area = area / 100)
+# mutate(
+#     name = case_when(
+#         name == "< 1 ha" ~ "Small farms",
+#         name == "> 1 000 ha" ~ "Big farms",
+#         .default = "Medium farms"
+#     )
+# ) |>
+# group_by(name) |>
+# summarize(across(everything(), sum))
+
+write_csv(big_or_small, "data/big_or_small.csv")
