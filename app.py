@@ -82,7 +82,7 @@ app_ui = ui.page_navbar(
                 ),
             ),
             ui.card(ui.card_header("Florence Nightingal")),
-            width=1 / 2,
+            width="600px",
         ),
     ),
     ui.nav_panel("Distributions", ui.markdown(placeholder_text())),
