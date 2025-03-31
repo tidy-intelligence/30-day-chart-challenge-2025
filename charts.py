@@ -1,6 +1,6 @@
 import altair as alt
 
-from data import fractions_data
+from data import circular_data, fractions_data, slope_data
 
 
 # NOTE: this approach only works on altair==5.4.1 (which is the pyodide version)
@@ -76,7 +76,74 @@ def fractions_chart():
         .add_params(region_selection, income_selection)
         .interactive()
     )
+
     return chart
 
 
 fractions_chart()
+
+
+def slope_chart():
+    base_chart = (
+        (
+            alt.Chart(slope_data).encode(
+                x=alt.X("year:O", title=None, axis=alt.Axis(labelAngle=0)),
+                y=alt.Y("value", title=None, axis=alt.Axis(format=".0%")),
+                color=alt.Color("name", legend=None),
+                tooltip=[
+                    alt.Tooltip("name", title="Country"),
+                    alt.Tooltip("year", title="Year"),
+                    alt.Tooltip("value", title="Proportion", format=".1%"),
+                ],
+            )
+        )
+        .properties(
+            title=alt.TitleParams(
+                "Proportion of women participating in the labor force, 2014 to 2023",
+            )
+        )
+        .interactive()
+    )
+
+    line_chart = base_chart.mark_line()
+    point_chart = base_chart.mark_point(filled=True)
+    labels = (
+        alt.Chart(slope_data)
+        .transform_filter(alt.datum.year == 2023)
+        .mark_text(align="left", dx=5)
+        .encode(
+            x=alt.X("year:O"),
+            y=alt.Y("value"),
+            text="name",
+            color="name",
+        )
+    )
+
+    chart = line_chart + point_chart + labels
+
+    return chart
+
+
+def circular_chart():
+    chart = (
+        alt.Chart(circular_data)
+        .mark_bar()
+        .encode(
+            x=alt.X("value", title=None, axis=alt.Axis(format=".0%")),
+            y=alt.Y("name", sort="-x", title=None),
+            color=alt.condition(
+                alt.datum.name == "EU", alt.value("darkblue"), alt.value("#61c0bf")
+            ),
+            tooltip=[
+                alt.Tooltip("name", title="Country"),
+                alt.Tooltip("value", title="Rate", format=".1%"),
+            ],
+        )
+        .properties(
+            title=alt.TitleParams(
+                "Circular material use rate, 2023",
+            )
+        )
+        .interactive()
+    )
+    return chart

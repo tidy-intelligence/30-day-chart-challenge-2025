@@ -31,7 +31,7 @@ gdp_per_capita_raw <- wdi_get(
 )
 
 # https://www.who.int/data/gho/data/indicators/indicator-details/GHO/alcohol-attributable-fractions-all-cause-deaths-(-)
-fraction_raw <- readr::read_csv("data.csv")
+fraction_raw <- readr::read_csv("data-raw/data.csv")
 
 fraction <- fraction_raw |>
     filter(Period == 2019 & Dim2 == "All age groups (total)") |>
@@ -58,4 +58,58 @@ fraction <- fraction_raw |>
     ) |>
     drop_na()
 
-write_csv(fraction, "fractions.csv")
+write_csv(fraction, "data/fractions.csv")
+
+
+# Slope ------------------------------------------------------------------
+
+slope_raw <- owid_get("female-labor-force-participation-rates-slopes")
+
+slope_sub <- slope_raw |>
+    filter(year %in% c(2014, 2023) & !is.na(entity_id)) |>
+    group_by(entity_name) |>
+    filter(n() == 2) |>
+    mutate(value = sl_tlf_cact_fe_ne_zs / 100)
+
+slope_selected <- slope_sub |>
+    group_by(entity_name) |>
+    summarize(
+        change = last(value) - first(value)
+    ) |>
+    arrange(-change) |>
+    slice(1:5)
+
+slope <- slope_sub |>
+    inner_join(slope_selected, join_by(entity_name)) |>
+    select(name = entity_name, value)
+
+write_csv(slope, "data/slope.csv")
+
+
+# Circular ---------------------------------------------------------------
+
+circular_raw <- read_delim("data-raw/estat_cei_srm030.tsv", delim = "\t")
+
+circular <- circular_raw |>
+    mutate(
+        entity_iso2code = substr(
+            `freq,unit,geo\\TIME_PERIOD`,
+            nchar(`freq,unit,geo\\TIME_PERIOD`) - 1,
+            nchar(`freq,unit,geo\\TIME_PERIOD`)
+        ),
+        value = parse_number(`2023 `) / 100
+    ) |>
+    left_join(entities) |>
+    mutate(
+        entity_name = case_when(
+            entity_iso2code == "EL" ~ "Greece",
+            entity_iso2code == "20" ~ "EU",
+            .default = entity_name
+        )
+    ) |>
+    select(
+        name = entity_name,
+        value
+    )
+
+write_csv(circular, "data/circular.csv")

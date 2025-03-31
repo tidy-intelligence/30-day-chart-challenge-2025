@@ -19,3 +19,5 @@ To build the app:
 ```
 shinylive export . docs
 ```
+
+TODO: https://anthology-of-data.science/posts/altair/better-altair-theme.html
