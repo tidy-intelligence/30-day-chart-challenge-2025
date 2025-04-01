@@ -31,7 +31,7 @@ app_ui = ui.page_navbar(
                     output_widget("fractions"),
                     ui.markdown(
                         "*Data Sources*: Alcohol-attributable fractions are from the World Health Organization's  [Global Health Observatory (2024)](https://www.who.int/data/gho/data/indicators/indicator-details/GHO/alcohol-attributable-fractions-all-cause-deaths-(-)). "
-                        "Region and income classifications are based on the World Bank's [Worl Development Indicators](https://databank.worldbank.org/source/world-development-indicators)."
+                        "Region and income classifications are based on the World Bank's [World Development Indicators](https://databank.worldbank.org/source/world-development-indicators)."
                     ),
                 ),
             ),

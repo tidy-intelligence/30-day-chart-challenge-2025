@@ -66,7 +66,7 @@ def fractions_chart():
                     alt.Tooltip("female", title="Female", format=".1%"),
                     alt.Tooltip("income_level_name", title="Income level"),
                     alt.Tooltip(
-                        "gdp_per_capita", title="GDP per Capita", format=",.0f"
+                        "gdp_per_capita", title="GDP per capita", format=",.0f"
                     ),
                 ],
                 opacity=alt.condition(
