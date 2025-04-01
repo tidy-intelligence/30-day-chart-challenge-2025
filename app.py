@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from shiny import App, render, ui
+from shiny import App, reactive, render, ui
 from shinywidgets import output_widget, render_altair
 
 from charts import (
@@ -10,6 +10,7 @@ from charts import (
     ranking_chart,
     slope_chart,
 )
+from data import slope_countries
 from utils import placeholder_text
 
 css_file = Path(__file__).parent / "css" / "styles.css"
@@ -39,7 +40,15 @@ app_ui = ui.page_navbar(
                 ui.card_header("Slope"),
                 ui.card_body(
                     ui.markdown(
-                        "The figure shows a **slope chart** of changes in female labor force participation rate between 2014 and 2023 for the 5 countries with the largest percentage point increase in this period."
+                        "The figure shows a **slope chart** of changes in female labor force participation rate between 2014 and 2023 for the selected countries."
+                    ),
+                    ui.input_selectize(
+                        "slope_countries",
+                        "",
+                        choices=[""],
+                        selected=None,
+                        multiple=True,
+                        width="100%",
                     ),
                     output_widget("slope"),
                     ui.markdown(
@@ -92,6 +101,21 @@ app_ui = ui.page_navbar(
 
 
 def server(input, output, session):
+    @reactive.effect
+    def _():
+        ui.update_selectize(
+            "slope_countries",
+            choices=slope_countries,
+            selected=[
+                "Bolivia",
+                "Malta",
+                "Guatemala",
+                "Bosnia and Herzegovina",
+                "Saudi Arabia",
+            ],
+            server=True,
+        )
+
     @output()
     @render_altair
     def fractions():
@@ -100,7 +124,7 @@ def server(input, output, session):
     @output()
     @render_altair
     def slope():
-        return slope_chart()
+        return slope_chart(input.slope_countries())
 
     @output()
     @render_altair

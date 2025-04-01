@@ -89,10 +89,20 @@ def fractions_chart():
 fractions_chart()
 
 
-def slope_chart():
+def slope_chart(
+    countries=[
+        "Bolivia",
+        "Malta",
+        "Guatemala",
+        "Bosnia and Herzegovina",
+        "Saudi Arabia",
+    ],
+):
+    slope_data_sub = slope_data[slope_data["name"].isin(countries)]
+
     base_chart = (
         (
-            alt.Chart(slope_data).encode(
+            alt.Chart(slope_data_sub).encode(
                 x=alt.X("year:O", title=None, axis=alt.Axis(labelAngle=0)),
                 y=alt.Y("value", title=None, axis=alt.Axis(format=".0%")),
                 color=alt.Color("name", legend=None),
@@ -114,7 +124,7 @@ def slope_chart():
     line_chart = base_chart.mark_line()
     point_chart = base_chart.mark_point(filled=True)
     labels = (
-        alt.Chart(slope_data)
+        alt.Chart(slope_data_sub)
         .transform_filter(alt.datum.year == 2023)
         .mark_text(align="left", dx=5)
         .encode(

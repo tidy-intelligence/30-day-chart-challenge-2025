@@ -4,10 +4,13 @@ import pandas as pd
 
 app_dir = Path(__file__).parent
 fractions_data = pd.read_csv(app_dir / "data/fractions.csv")
+
 slope_data = pd.read_csv(app_dir / "data/slope.csv")
+slope_countries = sorted(slope_data["name"].unique())
+
 circular_data = pd.read_csv(app_dir / "data/circular.csv")
+
 big_or_small_data = pd.read_csv(app_dir / "data/big_or_small.csv")
-ranking_data = pd.read_csv(app_dir / "data/ranking.csv")
 
 
 def group_farm_size(name):
@@ -29,3 +32,6 @@ group_order = ["Small", "Medium", "Big", "Very Big"]
 big_or_small_data["size_group"] = pd.Categorical(
     big_or_small_data["size_group"], categories=group_order, ordered=True
 )
+
+
+ranking_data = pd.read_csv(app_dir / "data/ranking.csv")

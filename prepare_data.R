@@ -58,16 +58,16 @@ slope_sub <- slope_raw |>
     filter(n() == 2) |>
     mutate(value = sl_tlf_cact_fe_ne_zs / 100)
 
-slope_selected <- slope_sub |>
-    group_by(entity_name) |>
-    summarize(
-        change = last(value) - first(value)
-    ) |>
-    arrange(-change) |>
-    slice(1:5)
+# slope_selected <- slope_sub |>
+#     group_by(entity_name) |>
+#     summarize(
+#         change = last(value) - first(value)
+#     ) |>
+#     arrange(-change) |>
+#     slice(1:5)
 
 slope <- slope_sub |>
-    inner_join(slope_selected, join_by(entity_name)) |>
+    # inner_join(slope_selected, join_by(entity_name)) |>
     select(name = entity_name, year, value)
 
 write_csv(slope, "data/slope.csv")
