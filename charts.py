@@ -141,7 +141,7 @@ def slope_chart(
 
 
 def circular_chart():
-    hover = alt.selection_single(on="mouseover", fields=["name"])
+    hover = alt.selection_point(on="mouseover", fields=["name"])
 
     chart = (
         alt.Chart(circular_data)
@@ -158,7 +158,7 @@ def circular_chart():
                 alt.Tooltip("value", title="Rate", format=".1%"),
             ],
         )
-        .add_selection(hover)
+        .add_params(hover)
         .properties(
             title=alt.TitleParams(
                 "Circular material use rate, 2023",
@@ -170,35 +170,42 @@ def circular_chart():
 
 
 def big_or_small_chart():
+    hover = alt.selection_point(on="mouseover", fields=["size_group"], empty=True)
+
     chart = (
         alt.Chart(big_or_small_data)
         .encode(
             alt.Theta("area").stack(True),
             alt.Radius("area").scale(type="sqrt"),
             color=alt.Color("size_group:N", legend=None),
+            opacity=alt.condition(hover, alt.value(1), alt.value(0.2)),
             tooltip=[
                 alt.Tooltip("size_group", title="Farm size"),
                 alt.Tooltip("area", title="Share of agricultural area", format=".1%"),
                 alt.Tooltip("farms", title="Number of farms", format=","),
             ],
         )
+        .add_params(hover)
         .properties(
             title=alt.TitleParams(
                 "Distribution of global agricultural area by farm size",
             )
         )
-        .interactive()
     )
 
-    arc = chart.mark_arc(innerRadius=20, stroke="#fff")
-    text = chart.mark_text(radiusOffset=50).encode(text="size_group")
+    arc = chart.mark_arc(innerRadius=24, stroke="#fff", cornerRadius=8)
+    text = chart.mark_text(radiusOffset=48).encode(text="size_group")
 
     chart = arc + text
     return chart
 
 
 def ranking_chart():
-    hover = alt.selection_single(on="mouseover")
+    hover = alt.selection_point(
+        on="mouseover",
+        fields=["name"],
+        empty=True,
+    )
 
     base_chart = alt.Chart(ranking_data).encode(
         x=alt.X("year", axis=alt.Axis(format="d", title=None)),
