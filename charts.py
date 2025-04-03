@@ -141,6 +141,8 @@ def slope_chart(
 
 
 def circular_chart():
+    hover = alt.selection_single(on="mouseover", fields=["name"])
+
     chart = (
         alt.Chart(circular_data)
         .mark_bar()
@@ -150,11 +152,13 @@ def circular_chart():
             color=alt.condition(
                 alt.datum.name == "EU", alt.value("darkblue"), alt.value("#61c0bf")
             ),
+            opacity=alt.condition(hover, alt.value(1), alt.value(0.2)),
             tooltip=[
                 alt.Tooltip("name", title="Country"),
                 alt.Tooltip("value", title="Rate", format=".1%"),
             ],
         )
+        .add_selection(hover)
         .properties(
             title=alt.TitleParams(
                 "Circular material use rate, 2023",
