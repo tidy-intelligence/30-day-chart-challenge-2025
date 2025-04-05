@@ -201,13 +201,9 @@ def big_or_small_chart():
 
 
 def ranking_chart():
-    hover = alt.selection_point(
-        on="mouseover",
-        fields=["name"],
-        empty=True,
-    )
+    hover = alt.selection_point(on="mouseover", fields=["name"])
 
-    base_chart = alt.Chart(ranking_data).encode(
+    base_encoding = alt.Chart(ranking_data).encode(
         x=alt.X("year", axis=alt.Axis(format="d", title=None)),
         y=alt.Y("rank", axis=alt.Axis(title=None)),
         color=alt.Color("name:N", legend=None),
@@ -215,7 +211,11 @@ def ranking_chart():
         strokeWidth=alt.condition(hover, alt.value(3), alt.value(1)),
     )
 
-    lines = base_chart.mark_line(point=True)
+    lines = base_encoding.mark_line()
+
+    points = base_encoding.mark_point(filled=True).encode(
+        size=alt.condition(hover, alt.value(60), alt.value(10))
+    )
 
     labels = (
         alt.Chart(ranking_data)
@@ -226,11 +226,12 @@ def ranking_chart():
             y=alt.Y("rank", axis=alt.Axis(title=None)),
             text="name",
             color="name",
+            opacity=alt.condition(hover, alt.value(1), alt.value(0.2)),
         )
     )
 
     chart = (
-        (lines + labels)
+        (lines + points + labels)
         .add_params(hover)
         .properties(title="Rank in the Economic Complexity Index")
     )
